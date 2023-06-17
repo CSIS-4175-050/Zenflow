@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "71653780850",
+    "project_id": "zenflow-7326",
+    "storage_bucket": "zenflow-7326.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71653780850:android:03b11472c093682840c1eb",
+        "android_client_info": {
+          "package_name": "com.mehla.zenfllow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "71653780850-5e8989jrpioluefupqsgd1favabmngih.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoGureg1-tMs6rGu-pUz9ypimImk4abTM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "71653780850-5e8989jrpioluefupqsgd1favabmngih.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71653780850:android:26e158d46bfe214e40c1eb",
+        "android_client_info": {
+          "package_name": "com.mehla.zenflow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "71653780850-5e8989jrpioluefupqsgd1favabmngih.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAoGureg1-tMs6rGu-pUz9ypimImk4abTM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "71653780850-5e8989jrpioluefupqsgd1favabmngih.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
