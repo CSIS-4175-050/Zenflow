@@ -2,6 +2,9 @@ package com.mehla.zenflow.ui.home;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CompoundButton;
@@ -10,10 +13,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
+import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.mehla.zenflow.R;
 import com.mehla.zenflow.databinding.FragmentHomeBinding;
+import androidx.appcompat.app.AppCompatActivity;
+
 
 public class HomeFragment extends Fragment {
 
@@ -38,4 +45,5 @@ public class HomeFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
 }

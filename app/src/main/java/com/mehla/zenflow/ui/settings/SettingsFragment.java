@@ -1,6 +1,5 @@
 package com.mehla.zenflow.ui.settings;
 
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,15 +7,13 @@ import android.view.ViewGroup;
 import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
-import com.mehla.zenflow.DarkMode;
-import com.mehla.zenflow.databinding.FragmentNotificationsBinding;
+import com.mehla.zenflow.services.DarkMode;
 import com.mehla.zenflow.databinding.FragmentSettingsBinding;
 
 public class SettingsFragment extends Fragment {

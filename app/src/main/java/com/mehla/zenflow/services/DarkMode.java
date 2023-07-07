@@ -1,4 +1,4 @@
-package com.mehla.zenflow;
+package com.mehla.zenflow.services;
 
 import android.content.Context;
 import android.content.SharedPreferences;
