@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Looper;
 import android.view.MotionEvent;
@@ -47,38 +48,12 @@ public class Timer extends AppCompatActivity {
     private Button startButton;
     private Button stopButton;
     private Button resetButton;
+    private Button increaseButton;
+    private Button decreaseButton;
 
-    private int minutes = 0;
-    private int seconds = 0;
-    private int milliseconds = 0;
+    private long initialTime = 5 * 60 * 1000; // 5 minutes in milliseconds
+    private CountDownTimer countDownTimer;
     private boolean isTimerRunning = false;
-    private Handler timerHandler = new Handler();
-
-    private Runnable timerRunnable = new Runnable() {
-        @Override
-        public void run() {
-            milliseconds++;
-
-            int displayMinutes = minutes;
-            int displaySeconds = seconds;
-            int displayMilliseconds = milliseconds;
-
-            if (displayMilliseconds >= 100) {
-                displaySeconds += displayMilliseconds / 100;
-                displayMilliseconds = displayMilliseconds % 100;
-            }
-
-            if (displaySeconds >= 60) {
-                displayMinutes += displaySeconds / 60;
-                displaySeconds = displaySeconds % 60;
-            }
-
-            String time = String.format("%02d:%02d:%02d", displayMinutes, displaySeconds, displayMilliseconds);
-            timerTextView.setText(time);
-
-            timerHandler.postDelayed(this, 1); // Update every millisecond
-        }
-    };
 
     private final Runnable mHidePart2Runnable = new Runnable() {
         @SuppressLint("InlinedApi")
@@ -167,12 +142,21 @@ public class Timer extends AppCompatActivity {
         // Upon interacting with UI controls, delay any scheduled hide()
         // operations to prevent the jarring behavior of controls going away
         // while interacting with the UI.
-        binding.dummyButton.setOnTouchListener(mDelayHideTouchListener);
+        // binding.cancelTimer.setOnTouchListener(mDelayHideTouchListener);
+
+        binding.cancelTimer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         timerTextView = binding.timerTextView;
         startButton = binding.startButton;
         stopButton = binding.stopButton;
         resetButton = binding.resetButton;
+        increaseButton = binding.increaseButton;
+        decreaseButton = binding.decreaseButton;
 
         startButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -194,41 +178,102 @@ public class Timer extends AppCompatActivity {
                 resetTimer();
             }
         });
+
+        increaseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                increaseTimerByOneMinute();
+            }
+        });
+
+        decreaseButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                decreaseTimerByOneMinute();
+            }
+        });
+
+        resetTimer();
     }
 
     private void startTimer() {
         if (!isTimerRunning) {
-            isTimerRunning = true;
-            timerHandler.postDelayed(timerRunnable, 0);
+            countDownTimer = new CountDownTimer(initialTime, 1000) {
+                @Override
+                public void onTick(long millisUntilFinished) {
+                    initialTime = millisUntilFinished;
+                    updateTimerText(millisUntilFinished);
+                }
 
-            resetButton.setVisibility(View.GONE); // Hide the reset button
+                @Override
+                public void onFinish() {
+                    isTimerRunning = false;
+                    updateTimerText(0);
+                    stopButton.setVisibility(View.GONE);
+                    resetButton.setVisibility(View.VISIBLE);
+                }
+            };
+
+            countDownTimer.start();
+            isTimerRunning = true;
             stopButton.setVisibility(View.VISIBLE);
+            resetButton.setVisibility(View.GONE);
+            increaseButton.setEnabled(false);
+            decreaseButton.setEnabled(false);
         }
     }
 
     private void stopTimer() {
         if (isTimerRunning) {
+            countDownTimer.cancel();
             isTimerRunning = false;
-            timerHandler.removeCallbacks(timerRunnable);
-
-            resetButton.setVisibility(View.VISIBLE); // Show the reset button
             stopButton.setVisibility(View.GONE);
+            resetButton.setVisibility(View.VISIBLE);
+            increaseButton.setEnabled(true);
+            decreaseButton.setEnabled(true);
         }
     }
 
     private void resetTimer() {
-        minutes = 0;
-        seconds = 0;
-        milliseconds = 0;
-        timerTextView.setText("00:00:00");
-        resetButton.setVisibility(View.GONE); // Hide the reset button
-        stopButton.setVisibility(View.VISIBLE);
+        if (isTimerRunning) {
+            countDownTimer.cancel();
+        }
+
+        initialTime = 5 * 60 * 1000; // 5 minutes in milliseconds
+        updateTimerText(initialTime);
+        stopButton.setVisibility(View.GONE);
+        resetButton.setVisibility(View.GONE);
+        increaseButton.setEnabled(true);
+        decreaseButton.setEnabled(true);
+    }
+
+    private void increaseTimerByOneMinute() {
+        if (!isTimerRunning) {
+            initialTime += 1 * 60 * 1000; // Increase by 1 minute
+            updateTimerText(initialTime);
+        }
+    }
+
+    private void decreaseTimerByOneMinute() {
+        if (!isTimerRunning && initialTime >= 2 * 60 * 1000) {
+            initialTime -= 1 * 60 * 1000; // Decrease by 1 minute
+            updateTimerText(initialTime);
+        }
+    }
+
+    private void updateTimerText(long milliseconds) {
+        int minutes = (int) (milliseconds / 1000) / 60;
+        int seconds = (int) (milliseconds / 1000) % 60;
+        String time = String.format("%02d:%02d", minutes, seconds);
+        timerTextView.setText(time);
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        stopTimer();
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
     }
 
     @Override

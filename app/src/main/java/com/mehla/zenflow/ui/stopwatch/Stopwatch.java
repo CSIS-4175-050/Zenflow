@@ -179,6 +179,7 @@ public class Stopwatch extends AppCompatActivity {
         timerTextView = binding.timerTextView;
         startButton = binding.startButton;
         stopButton = binding.stopButton;
+        stopButton.setEnabled(false);
         resetButton = binding.resetButton;
 
         startButton.setOnClickListener(new View.OnClickListener() {
@@ -210,6 +211,7 @@ public class Stopwatch extends AppCompatActivity {
 
             resetButton.setVisibility(View.GONE); // Hide the reset button
             stopButton.setVisibility(View.VISIBLE);
+            stopButton.setEnabled(true);
         }
     }
 
@@ -230,6 +232,7 @@ public class Stopwatch extends AppCompatActivity {
         timerTextView.setText("00:00:00");
         resetButton.setVisibility(View.GONE); // Hide the reset button
         stopButton.setVisibility(View.VISIBLE);
+        stopButton.setEnabled(false);
     }
 
     @Override
