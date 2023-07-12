@@ -7,7 +7,14 @@
     android:gravity="center"
     android:layout_height="match_parent"
     android:padding="15dp"
-    tools:context=".Login">
+    tools:context=".ui.login.Login">
+
+    <ImageView
+        android:id="@+id/login_logo"
+        android:layout_width="152dp"
+        android:layout_height="118dp"
+        android:layout_margin="10dp"
+        android:src="@mipmap/ic_launcher" />
 
     <TextView
         android:text="@string/login"
@@ -20,22 +27,26 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/email"
-            android:hint="@string/email"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="@string/email" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
+
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password"
-            android:hint="@string/password"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:hint="@string/password" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <ProgressBar
@@ -48,7 +59,8 @@
         android:id="@+id/btn_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/login"/>
+        android:layout_margin="10dp"
+        android:text="@string/login" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -59,4 +71,5 @@
         android:textSize="20sp"
         android:gravity="center"
         android:layout_marginTop="20dp"/>
+
 </LinearLayout>

@@ -18,4 +18,8 @@
     <string name="login">Login</string>
     <string name="clickToLogin">Click to login</string>
     <string name="clickToRegister">Click to register</string>
+    <string name="email_id">Email Id</string>
+    <string name="dark_mode">Dark Mode</string>
+    <string name="logout">Logout</string>
+    <string name="profile_picture">Profile Picture</string>
 </resources>

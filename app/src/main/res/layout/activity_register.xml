@@ -7,7 +7,14 @@
     android:gravity="center"
     android:layout_height="match_parent"
     android:padding="15dp"
-    tools:context=".Register">
+    tools:context=".ui.login.Register">
+
+    <ImageView
+        android:id="@+id/login_logo"
+        android:layout_width="152dp"
+        android:layout_height="118dp"
+        android:layout_margin="10dp"
+        android:src="@mipmap/ic_launcher" />
 
     <TextView
         android:text="@string/register"
@@ -20,7 +27,8 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/email"
             android:hint="@string/email"
@@ -30,7 +38,8 @@
 
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="10dp">
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/password"
             android:hint="@string/password"
@@ -48,8 +57,9 @@
         android:id="@+id/btn_register"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/register"/>
-    
+        android:text="@string/register"
+        android:layout_margin="10dp"/>
+
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

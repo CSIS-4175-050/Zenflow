@@ -1,6 +1,4 @@
-package com.mehla.zenflow;
-
-import static androidx.fragment.app.FragmentManager.TAG;
+package com.mehla.zenflow.ui.login;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -8,7 +6,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
@@ -21,24 +18,34 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.mehla.zenflow.databinding.ActivityMainBinding;
-import com.mehla.zenflow.databinding.ActivityRegisterBinding;
+import com.mehla.zenflow.MainActivity;
+import com.mehla.zenflow.databinding.ActivityLoginBinding;
 
-public class Register extends AppCompatActivity {
+public class Login extends AppCompatActivity {
 
-    private ActivityRegisterBinding binding;
+    private ActivityLoginBinding binding;
+
     FirebaseAuth mAuth;
 
     TextInputEditText editTextEmail, editTextPassword;
-    Button buttonReg;
+    Button buttonLogin;
     ProgressBar progressBar;
-    TextView txtLoginNow;
+    TextView txtRegisterNow;
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        // Check if user is signed in (non-null) and update UI accordingly.
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if(currentUser != null){
+            startMainActivity();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        binding = ActivityRegisterBinding.inflate(getLayoutInflater());
+        binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
 
@@ -46,20 +53,20 @@ public class Register extends AppCompatActivity {
 
         editTextEmail = binding.email;
         editTextPassword = binding.password;
-        buttonReg = binding.btnRegister;
+        buttonLogin = binding.btnLogin;
         progressBar = binding.progresBar;
-        txtLoginNow = binding.loginNow;
+        txtRegisterNow = binding.registerNow;
 
-        txtLoginNow.setOnClickListener(new View.OnClickListener() {
+        txtRegisterNow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), Login.class);
+                Intent intent = new Intent(getApplicationContext(), Register.class);
                 startActivity(intent);
                 finish();
             }
         });
 
-        buttonReg.setOnClickListener(new View.OnClickListener() {
+        buttonLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
@@ -70,49 +77,35 @@ public class Register extends AppCompatActivity {
                 password = String.valueOf(editTextPassword.getText());
 
                 if(TextUtils.isEmpty(email)){
-                    Toast.makeText(Register.this, "Enter email", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Login.this, "Enter email", Toast.LENGTH_LONG).show();
                     return;
                 }
 
                 if(TextUtils.isEmpty(password)){
-                    Toast.makeText(Register.this, "Enter password", Toast.LENGTH_LONG).show();
+                    Toast.makeText(Login.this, "Enter password", Toast.LENGTH_LONG).show();
                     return;
                 }
 
-                mAuth.createUserWithEmailAndPassword(email, password)
+                mAuth.signInWithEmailAndPassword(email, password)
                     .addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                         @Override
                         public void onComplete(@NonNull Task<AuthResult> task) {
                             progressBar.setVisibility(View.GONE);
 
                             if (task.isSuccessful()) {
-                                // Sign in success, update UI with the signed-in user's information
-//                                FirebaseUser user = mAuth.getCurrentUser();
-//                                updateUI(user);
-                                Toast.makeText(Register.this, "Account created.",
+                                Toast.makeText(Login.this, "Login Success.",
                                         Toast.LENGTH_SHORT).show();
 
                                 startMainActivity();
                             } else {
                                 // If sign in fails, display a message to the user.
-                                Toast.makeText(Register.this, "Authentication failed.",
+                                Toast.makeText(Login.this, "Authentication failed.",
                                         Toast.LENGTH_SHORT).show();
-//                                updateUI(null);
                             }
                         }
                     });
             }
         });
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        // Check if user is signed in (non-null) and update UI accordingly.
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if(currentUser != null){
-            startMainActivity();
-        }
     }
 
     private void startMainActivity() {

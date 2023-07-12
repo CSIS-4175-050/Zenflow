@@ -13,10 +13,10 @@
         android:theme="@style/Theme.Zenflow"
         tools:targetApi="31">
         <activity
-            android:name=".Register"
+            android:name=".ui.login.Register"
             android:exported="false" />
         <activity
-            android:name=".Login"
+            android:name=".ui.login.Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

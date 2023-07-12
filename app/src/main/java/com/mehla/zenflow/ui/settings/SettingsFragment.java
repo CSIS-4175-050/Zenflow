@@ -17,7 +17,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.mehla.zenflow.Login;
+import com.mehla.zenflow.ui.login.Login;
 import com.mehla.zenflow.services.DarkMode;
 import com.mehla.zenflow.databinding.FragmentSettingsBinding;
 
