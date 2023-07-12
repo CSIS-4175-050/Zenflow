@@ -12,4 +12,10 @@
     <string name="title_activity_stopwatch">Stopwatch</string>
     <string name="cancel_stopwatch">Cancel Stopwatch</string>
     <string name="cancel_timer">Cancel Timer</string>
+    <string name="register">Register</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="login">Login</string>
+    <string name="clickToLogin">Click to login</string>
+    <string name="clickToRegister">Click to register</string>
 </resources>
