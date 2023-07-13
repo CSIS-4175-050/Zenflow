@@ -25,7 +25,7 @@ public class FirebaseService {
     public FirebaseService() {
         db = FirebaseFirestore.getInstance();
 
-        createData();
+//        createData();
 
         readDate();
     }
