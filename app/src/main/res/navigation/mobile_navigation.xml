@@ -18,10 +18,10 @@
         tools:layout="@layout/fragment_dashboard" />
 
     <fragment
-        android:id="@+id/navigation_notifications"
-        android:name="com.mehla.zenflow.ui.notifications.NotificationsFragment"
-        android:label="@string/title_notifications"
-        tools:layout="@layout/fragment_notifications" />
+        android:id="@+id/navigation_workouts"
+        android:name="com.mehla.zenflow.ui.workouts.WorkoutsFragment"
+        android:label="@string/title_workouts"
+        tools:layout="@layout/fragment_workouts" />
 
     <fragment
         android:id="@+id/navigation_settings"
