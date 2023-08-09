@@ -1,6 +1,7 @@
 package com.mehla.zenflow.ui.dashboard;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,9 +24,11 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
 
     private Context context;
     private List<Exercise> exerciseList;
+    private OnItemClickListener clickListener;
 
-    public ExerciseAdapter(Context context, List<Exercise> exerciseList) {
+    public ExerciseAdapter(Context context, List<Exercise> exerciseList, OnItemClickListener clickListener) {
         this.context = context;
+        this.clickListener = clickListener;
         this.exerciseList = exerciseList;
     }
 
@@ -34,6 +37,10 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
     public ExerciseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(context).inflate(R.layout.exercise_item, parent, false);
         return new ExerciseViewHolder(view);
+    }
+
+    public interface OnItemClickListener {
+        void onItemClick(int position);
     }
 
     @Override
@@ -57,6 +64,12 @@ public class ExerciseAdapter extends RecyclerView.Adapter<ExerciseAdapter.Exerci
                         holder.errorImage.setVisibility(View.VISIBLE);
                     }
                 });
+
+        holder.itemView.setOnClickListener(view -> {
+            if (clickListener != null) {
+                clickListener.onItemClick(position);
+            }
+        });
     }
 
     @Override

@@ -10,6 +10,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,7 +30,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class DashboardFragment extends Fragment {
+public class DashboardFragment extends Fragment implements ExerciseAdapter.OnItemClickListener {
 
     private FragmentDashboardBinding binding;
     private RecyclerView recyclerView;
@@ -46,7 +48,7 @@ public class DashboardFragment extends Fragment {
         recyclerView = root.findViewById(R.id.recycler_view);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         exerciseList = new ArrayList<>();
-        exerciseAdapter = new ExerciseAdapter(getContext(), exerciseList);
+        exerciseAdapter = new ExerciseAdapter(getContext(), exerciseList, this);
         recyclerView.setAdapter(exerciseAdapter);
 
         fetchExercises();
@@ -90,4 +92,25 @@ public class DashboardFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
+
+    @Override
+    public void onItemClick(int position) {
+        // Create an instance of the ExerciseDetails fragment
+        ExerciseDetails detailFragment = new ExerciseDetails();
+
+        // Pass the clicked position as an argument to the ExerciseDetails fragment
+        Bundle args = new Bundle();
+        args.putInt("position", position);
+        detailFragment.setArguments(args);
+
+        // Replace the current fragment with the ExerciseDetails fragment
+        FragmentManager fragmentManager = getParentFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.setReorderingAllowed(true); // Set reordering allowed flag
+        transaction.replace(R.id.nav_host_fragment_activity_main, detailFragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+
 }
