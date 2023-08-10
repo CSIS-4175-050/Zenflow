@@ -24,6 +24,7 @@ import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.mehla.zenflow.MainActivity;
 import com.mehla.zenflow.R;
 import com.mehla.zenflow.databinding.FragmentHomeBinding;
 import com.mehla.zenflow.interfaces.ExerciseApi;
@@ -185,6 +186,13 @@ public class HomeFragment extends Fragment {
         String randomQuote = getRandomQuote();
         dayQuote = binding.dayQuote;
         dayQuote.setText(randomQuote);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Update Option Menu
+        ((MainActivity) getActivity()).updateMenu();
     }
 
 }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/action_add"
+        android:title="Add"
+        android:icon="@android:drawable/ic_input_add"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/option_menu_timer"
+        android:title="@string/option_menu_timer"
+        app:showAsAction="never"
+        android:visible="true">
+    </item>
+
+    <item
+        android:id="@+id/option_menu_stopwatch"
+        android:title="@string/option_menu_stopwatch"
+        app:showAsAction="never"
+        android:visible="true">
+    </item>
+</menu>

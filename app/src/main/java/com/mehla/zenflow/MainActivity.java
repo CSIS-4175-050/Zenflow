@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -13,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
+import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.fragment.NavHostFragment;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -25,6 +27,7 @@ import com.mehla.zenflow.services.DarkMode;
 import com.mehla.zenflow.ui.dashboard.ExerciseDetails;
 import com.mehla.zenflow.ui.stopwatch.Stopwatch;
 import com.mehla.zenflow.ui.timer.Timer;
+import com.mehla.zenflow.ui.workouts.WorkoutsFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -85,7 +88,21 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.home_options_menu, menu);
+        MenuInflater inflater = getMenuInflater();
+
+        // Find the NavController
+        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_activity_main);
+
+        // Get the current destination
+        NavDestination currentDestination = navController.getCurrentDestination();
+
+        // Check if the current destination corresponds to WorkoutsFragment
+        if (currentDestination != null && currentDestination.getId() == R.id.navigation_workouts) {
+            inflater.inflate(R.menu.workouts_menu, menu);
+        } else {
+            inflater.inflate(R.menu.home_options_menu, menu);
+        }
+
         return true;
     }
 
@@ -100,13 +117,20 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             return true;
         } else if (item.getItemId() == android.R.id.home) {
-
-//            navController.navigate(R.id.navigation_dashboard);
-            onBackPressed();
+            navController.navigate(R.id.navigation_dashboard);
+            return true;
+        } else if (item.getItemId() == R.id.action_add) {
+            // Handle the click here
+            Log.d(">>", "Add button clicked");
             return true;
         } else {
             return super.onOptionsItemSelected(item);
         }
+    }
+
+    public void updateMenu() {
+        // This will show the menu
+        invalidateOptionsMenu();
     }
 
     @Override

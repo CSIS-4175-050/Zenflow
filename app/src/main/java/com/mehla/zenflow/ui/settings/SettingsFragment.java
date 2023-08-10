@@ -37,6 +37,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+import com.mehla.zenflow.MainActivity;
 import com.mehla.zenflow.ui.login.Login;
 import com.mehla.zenflow.services.DarkMode;
 import com.mehla.zenflow.databinding.FragmentSettingsBinding;
@@ -227,5 +228,12 @@ public class SettingsFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        // Update Option Menu
+        ((MainActivity) getActivity()).updateMenu();
     }
 }

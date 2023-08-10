@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.mehla.zenflow.MainActivity;
 import com.mehla.zenflow.R;
 import com.mehla.zenflow.databinding.FragmentDashboardBinding;
 import com.mehla.zenflow.interfaces.ExerciseApi;
@@ -128,5 +129,12 @@ public class DashboardFragment extends Fragment implements ExerciseAdapter.OnIte
         transaction.commit();
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        // Update Option Menu
+        ((MainActivity) getActivity()).updateMenu();
+    }
 
 }
