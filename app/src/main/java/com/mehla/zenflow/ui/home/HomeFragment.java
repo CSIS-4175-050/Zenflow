@@ -22,6 +22,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatDelegate;
 import androidx.core.view.MenuProvider;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.mehla.zenflow.MainActivity;
@@ -29,6 +31,7 @@ import com.mehla.zenflow.R;
 import com.mehla.zenflow.databinding.FragmentHomeBinding;
 import com.mehla.zenflow.interfaces.ExerciseApi;
 import com.mehla.zenflow.model.Exercise;
+import com.mehla.zenflow.ui.dashboard.ExerciseDetails;
 import com.squareup.picasso.Picasso;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -66,6 +69,7 @@ public class HomeFragment extends Fragment {
     private ProgressBar imageLoading;
     private SharedPreferences sharedPreferences;
     private List<Exercise> exerciseList;
+    private Exercise exercise;
 
     private static final int MAX_RETRIES = 3;
     private int retryCount = 0;
@@ -99,6 +103,37 @@ public class HomeFragment extends Fragment {
         cardDesc = root.findViewById(R.id.card_desc);
         imageView = root.findViewById(R.id.imageView);
         imageLoading = root.findViewById(R.id.image_loading);
+        binding.popularExerciseCard.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Create an instance of the ExerciseDetails fragment
+                ExerciseDetails detailFragment = new ExerciseDetails();
+
+                // Pass the selected exercise details as arguments to the ExerciseDetails fragment
+                Bundle args = new Bundle();
+
+                args.putString("englishName", exercise.getEnglishName());
+                args.putString("sanskritName", exercise.getSanskritName());
+                args.putString("description", exercise.getDescription());
+                args.putString("image", exercise.getImage());
+                args.putString("benefits", exercise.getBenefits());
+                args.putString("steps", exercise.getSteps());
+                args.putString("time", exercise.getTime());
+                args.putString("category", exercise.getCategory());
+                args.putString("target", exercise.getTarget());
+
+                // Add more details as needed
+                detailFragment.setArguments(args);
+
+                // Replace the current fragment with the ExerciseDetails fragment
+                FragmentManager fragmentManager = getParentFragmentManager();
+                FragmentTransaction transaction = fragmentManager.beginTransaction();
+                transaction.setReorderingAllowed(true); // Set reordering allowed flag
+                transaction.replace(R.id.nav_host_fragment_activity_main, detailFragment);
+                transaction.addToBackStack(null);
+                transaction.commit();
+            }
+        });
 
         sharedPreferences = getActivity().getSharedPreferences("app", Context.MODE_PRIVATE);
 
@@ -141,7 +176,7 @@ public class HomeFragment extends Fragment {
         if(retryCount < MAX_RETRIES) {
             Random random = new Random();
             int index = random.nextInt(exerciseList.size());
-            Exercise exercise = exerciseList.get(index);
+            exercise = exerciseList.get(index);
 
             cardTitle.setText(exercise.getSanskritName());
             cardDesc.setText(exercise.getDescription());
