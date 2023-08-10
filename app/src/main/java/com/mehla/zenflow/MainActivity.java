@@ -32,6 +32,7 @@ import com.mehla.zenflow.ui.workouts.WorkoutsFragment;
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
+    private WorkoutsFragment workoutsFragment;
 
     private NavController navController;
 
@@ -43,6 +44,8 @@ public class MainActivity extends AppCompatActivity {
 
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        workoutsFragment = new WorkoutsFragment();
 
         BottomNavigationView navView = findViewById(R.id.nav_view);
         // Passing each menu ID as a set of Ids because each
@@ -120,8 +123,7 @@ public class MainActivity extends AppCompatActivity {
             navController.navigate(R.id.navigation_dashboard);
             return true;
         } else if (item.getItemId() == R.id.action_add) {
-            // Handle the click here
-            Log.d(">>", "Add button clicked");
+            addExercise();
             return true;
         } else {
             return super.onOptionsItemSelected(item);
@@ -131,6 +133,20 @@ public class MainActivity extends AppCompatActivity {
     public void updateMenu() {
         // This will show the menu
         invalidateOptionsMenu();
+    }
+
+    public void addExercise() {
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(R.id.nav_host_fragment_activity_main);
+        Fragment currentFragment = null;
+        if (navHostFragment != null) {
+            currentFragment = navHostFragment.getChildFragmentManager().getFragments().get(0);
+        }
+
+        if (currentFragment != null && currentFragment instanceof WorkoutsFragment) {
+            ((WorkoutsFragment) currentFragment).addExercise();
+        } else {
+            Log.e("MainActivity", "WorkoutsFragment is not the current fragment!");
+        }
     }
 
     @Override
