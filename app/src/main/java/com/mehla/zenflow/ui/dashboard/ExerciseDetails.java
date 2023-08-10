@@ -21,64 +21,50 @@ import android.view.ViewGroup;
 import androidx.appcompat.widget.Toolbar;
 
 import com.mehla.zenflow.R;
+import com.mehla.zenflow.databinding.FragmentDashboardBinding;
+import com.mehla.zenflow.databinding.FragmentExerciseDetailsBinding;
+import com.mehla.zenflow.model.Exercise;
+import com.squareup.picasso.Picasso;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link ExerciseDetails#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ExerciseDetails extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    Exercise e;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    FragmentExerciseDetailsBinding binding;
 
-    public ExerciseDetails() {
-        // Required empty public constructor
-    }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ExerciseDetails.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ExerciseDetails newInstance(String param1, String param2) {
-        ExerciseDetails fragment = new ExerciseDetails();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    public ExerciseDetails() {}
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_exercise_details, container, false);
 
-        return view;
+        binding = FragmentExerciseDetailsBinding.inflate(inflater, container, false);
+        View root = binding.getRoot();
+
+        e = new Exercise();
+
+        Bundle args = getArguments();
+        if (args != null) {
+            e.setEnglishName(args.getString("englishName"));
+            e.setSanskritName(args.getString("sanskritName"));
+            e.setDescription(args.getString("description"));
+            e.setBenefits(args.getString("benefits"));
+            e.setCategory(args.getString("category"));
+            e.setSteps(args.getString("steps"));
+            e.setTarget(args.getString("target"));
+            e.setTime(args.getString("time"));
+            e.setImage(args.getString("image"));
+        }
+
+        return root;
     }
 
     @Override
@@ -90,7 +76,7 @@ public class ExerciseDetails extends Fragment {
         if (activity != null) {
             ActionBar actionBar = activity.getSupportActionBar();
             if (actionBar != null) {
-                actionBar.setTitle("Your New Title");
+                actionBar.setTitle(e.getEnglishName());
 
                 // Enable the Up/Back button in the ActionBar
                 actionBar.setDisplayHomeAsUpEnabled(true);
@@ -99,6 +85,31 @@ public class ExerciseDetails extends Fragment {
                 actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_24);
             }
         }
+
+        binding.edTitle.setText(e.getEnglishName());
+        binding.edSanskritName.setText(e.getSanskritName());
+        binding.edTime.setText(e.getTime());
+        binding.edCategory.setText(e.getCategory());
+        binding.edDescription.setText(e.getDescription());
+        binding.edSteps.setText(e.getSteps());
+        binding.edBenefits.setText(e.getBenefits());
+        Picasso.get()
+                .load(e.getImage())
+                .into(binding.edImage, new com.squareup.picasso.Callback() {
+                    @Override
+                    public void onSuccess() {
+                        binding.imageLoading.setVisibility(View.GONE);
+                        binding.errorImage.setVisibility(View.GONE);
+                    }
+
+                    @Override
+                    public void onError(Exception e) {
+                        binding.imageLoading.setVisibility(View.GONE);
+                        binding.errorImage.setVisibility(View.VISIBLE);
+                    }
+                });
+
+
     }
 
 }

@@ -98,9 +98,25 @@ public class DashboardFragment extends Fragment implements ExerciseAdapter.OnIte
         // Create an instance of the ExerciseDetails fragment
         ExerciseDetails detailFragment = new ExerciseDetails();
 
-        // Pass the clicked position as an argument to the ExerciseDetails fragment
+        // Get the selected exercise
+        Exercise selectedExercise = exerciseList.get(position);
+
+        // Pass the selected exercise details as arguments to the ExerciseDetails fragment
         Bundle args = new Bundle();
+
         args.putInt("position", position);
+        args.putString("englishName", selectedExercise.getEnglishName());
+        args.putString("sanskritName", selectedExercise.getSanskritName());
+        args.putString("description", selectedExercise.getDescription());
+        args.putString("image", selectedExercise.getImage());
+        args.putString("benefits", selectedExercise.getBenefits());
+        args.putString("steps", selectedExercise.getSteps());
+        args.putString("time", selectedExercise.getTime());
+        args.putString("category", selectedExercise.getCategory());
+        args.putString("target", selectedExercise.getTarget());
+
+
+        // Add more details as needed
         detailFragment.setArguments(args);
 
         // Replace the current fragment with the ExerciseDetails fragment

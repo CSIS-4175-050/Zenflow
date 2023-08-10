@@ -12,6 +12,10 @@ public class Exercise {
     private String description;
     private String time;
     private String image;
+    private String benefits;
+    private String category;
+    private String target;
+    private String steps;
 
     // getters and setters
 
@@ -53,5 +57,37 @@ public class Exercise {
 
     public void setImage(String image) {
         this.image = image;
+    }
+
+    public String getBenefits() {
+        return benefits;
+    }
+
+    public void setBenefits(String benefits) {
+        this.benefits = benefits;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public void setTarget(String target) {
+        this.target = target;
+    }
+
+    public String getSteps() {
+        return steps;
+    }
+
+    public void setSteps(String steps) {
+        this.steps = steps;
     }
 }
