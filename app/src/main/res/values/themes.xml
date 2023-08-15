@@ -12,6 +12,7 @@
         <!-- Status bar color. -->
         <item name="android:statusBarColor">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
+        <item name="exerciseNameTextColor">?attr/colorOnSecondary</item>
     </style>
 
     <style name="Theme.Zenflow.Fullscreen" parent="Theme.Zenflow">
