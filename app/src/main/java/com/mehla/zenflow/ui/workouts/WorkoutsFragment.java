@@ -1,10 +1,13 @@
 package com.mehla.zenflow.ui.workouts;
 
+import static android.content.ContentValues.TAG;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -25,19 +28,47 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.LinearLayoutManager;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.mehla.zenflow.MainActivity;
 import com.mehla.zenflow.R;
 import com.mehla.zenflow.databinding.FragmentWorkoutsBinding;
 import com.mehla.zenflow.databinding.FragmentWorkoutsBinding;
+import com.mehla.zenflow.ui.login.Login;
 
 import java.text.DateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WorkoutsFragment extends Fragment {
 
     private FragmentWorkoutsBinding binding;
+
+    FirebaseFirestore db;
+    FirebaseAuth mAuth;
+    FirebaseUser user;
+
+    private WorkoutAdapter adapter;
+
+    List<Map<String, Object>> workoutsList;
+
+
+    int mYear, mMonth, mDay, mMinute, mSecond;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -46,6 +77,23 @@ public class WorkoutsFragment extends Fragment {
 
         binding = FragmentWorkoutsBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+        db = FirebaseFirestore.getInstance();
+        mAuth = FirebaseAuth.getInstance();
+        user = mAuth.getCurrentUser();
+
+        workoutsList = new ArrayList<>();
+
+        adapter = new WorkoutAdapter(workoutsList);
+        binding.workoutsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        binding.workoutsRecyclerView.setAdapter(adapter);
+
+        if(user == null) {
+            Intent intent = new Intent(getActivity(), Login.class);
+            startActivity(intent);
+        }
+
+        fetchWorkouts();
 
         return root;
     }
@@ -90,7 +138,13 @@ public class WorkoutsFragment extends Fragment {
         datePlaceholder.setOnClickListener(v -> {
             Calendar calendar = Calendar.getInstance();
             DatePickerDialog datePickerDialog = new DatePickerDialog(getActivity(),
-                    (view, year, month, dayOfMonth) -> datePlaceholder.setText("Select Date : " + dayOfMonth + "/" + (month + 1) + "/" + year),
+                    (view, year, month, dayOfMonth) -> {
+                        mYear = year;
+                        mMonth = month + 1;
+                        mDay = dayOfMonth;
+
+                        datePlaceholder.setText("Select Date : " + dayOfMonth + "/" + (month + 1) + "/" + year);
+                    },
                     calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH), calendar.get(Calendar.DAY_OF_MONTH));
 
             // Set maximum date to today
@@ -118,13 +172,13 @@ public class WorkoutsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 // Get values
-                String exercise = exerciseInput.getText().toString();
+                String exerciseName = exerciseInput.getText().toString();
                 String time = timePlaceholder.getText().toString();
                 String date = datePlaceholder.getText().toString();
 
                 // Validate all fields are provided
                 String errorMessage = null;
-                if (exercise.isEmpty()) {
+                if (exerciseName.isEmpty()) {
                     errorMessage = "Exercise name is required!";
                 } else if ("Select Time".equals(time)) {
                     errorMessage = "Time selection is required!";
@@ -138,14 +192,75 @@ public class WorkoutsFragment extends Fragment {
                     return;
                 }
 
-                // Log the values
-                Log.d("ExerciseDialog", "Exercise: " + exercise);
-                Log.d("ExerciseDialog", "Time: " + time);
-                Log.d("ExerciseDialog", "Date: " + date);
+                saveWorkout(exerciseName);
                 dialog.dismiss();
             }
         });
 
+    }
+
+    public void saveWorkout(String exerciseName) {
+        if (user != null) {
+            String userId = user.getUid();
+
+            // Reference to the user's document
+            DocumentReference userDocRef = db.collection("users").document(userId);
+
+            // Check if the user document exists
+            userDocRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (!document.exists()) {
+                            // The user doesn't exist, create a new document with placeholder data or some initial data
+                            Map<String, Object> userData = new HashMap<>();
+                            userData.put("uid", userId);
+                            userData.put("email", user.getEmail());  // example field
+
+                            userDocRef.set(userData);  // This will create the document with the user's ID and set the initial data
+                        }
+
+                        // Now, add the workout data to the user's sub-collection 'workouts'
+                        addWorkout(userId, exerciseName, getView());
+                    } else {
+                        Log.d("ExerciseDialog", "Failed checking user existence: ", task.getException());
+                    }
+                }
+            });
+        } else {
+            Log.d("ExerciseDialog", "No user is signed in!");
+        }
+    }
+
+    private void addWorkout(String userId, String exerciseName, View rootView) {
+        Map<String, Object> workoutData = new HashMap<>();
+        workoutData.put("ExerciseName", exerciseName);
+        workoutData.put("Year", mYear);
+        workoutData.put("Month", mMonth);
+        workoutData.put("Day", mDay);
+        workoutData.put("Minute", mMinute);
+        workoutData.put("Second", mSecond);
+        workoutData.put("creationDate", FieldValue.serverTimestamp());
+
+        db.collection("users").document(userId).collection("workouts")
+                .add(workoutData)
+                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                    @Override
+                    public void onSuccess(DocumentReference documentReference) {
+                        Log.d("ExerciseDialog", "Workout added with ID: " + documentReference.getId());
+                        Snackbar.make(rootView, "Data inserted successfully!", Snackbar.LENGTH_SHORT).show();
+
+                        fetchWorkouts();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("ExerciseDialog", "Error saving workout data: " + e.getMessage());
+                        Snackbar.make(rootView, "Error: " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
     }
 
     private void showTimePickerDialog(TextView timePlaceholder) {
@@ -194,12 +309,45 @@ public class WorkoutsFragment extends Fragment {
                 .setPositiveButton("OK", (dialog, which) -> {
                     int selectedMinutes = minutePicker.getValue();
                     int selectedSeconds = secondPicker.getValue();
+
+                    mMinute = selectedMinutes;
+                    mSecond = selectedSeconds;
+
                     timePlaceholder.setText("Select time : " + selectedMinutes + " min " + selectedSeconds + " sec");
                 })
                 .setNegativeButton("Cancel", null)
                 .show();
     }
 
+    public void fetchWorkouts() {
+        if(user != null) {
+            db.collection("users").document(user.getUid()).collection("workouts")
+                    .orderBy("creationDate", Query.Direction.DESCENDING)  // Order by creationDate in descending order
+                    .get()
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            workoutsList.clear(); // Clear the existing data
+
+                            for (DocumentSnapshot doc : task.getResult()) {
+                                workoutsList.add(doc.getData());
+                            }
+
+                            if (workoutsList.isEmpty()) {
+                                binding.workoutsRecyclerView.setVisibility(View.GONE);
+                                binding.noWorkoutsTextview.setVisibility(View.VISIBLE);
+                            } else {
+                                binding.workoutsRecyclerView.setVisibility(View.VISIBLE);
+                                binding.noWorkoutsTextview.setVisibility(View.GONE);
+                            }
+
+                            // Notify the adapter that data has changed
+                            adapter.notifyDataSetChanged();
+                        } else {
+                            Log.d(TAG, "Error fetching workouts: ", task.getException());
+                        }
+                    });
+        }
+    }
 
     @Override
     public void onDestroyView() {
