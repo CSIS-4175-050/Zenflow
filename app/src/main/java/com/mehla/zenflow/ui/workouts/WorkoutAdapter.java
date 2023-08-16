@@ -77,7 +77,6 @@ public class WorkoutAdapter extends RecyclerView.Adapter<WorkoutAdapter.ViewHold
         String timeFormatted = String.format(Locale.getDefault(), "%02d:%02d", minute, second);
         holder.workoutTime.setText("Time: " + timeFormatted);
 
-        // Assuming creationDate is a timestamp. If not, further parsing might be required.
         Timestamp creationTimestamp = (Timestamp) workout.get("creationDate");
         Date creationDate = creationTimestamp.toDate();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());

@@ -40,6 +40,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -47,15 +48,20 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.SetOptions;
 import com.mehla.zenflow.MainActivity;
 import com.mehla.zenflow.R;
 import com.mehla.zenflow.databinding.FragmentWorkoutsBinding;
 import com.mehla.zenflow.databinding.FragmentWorkoutsBinding;
+import com.mehla.zenflow.model.Workout;
 import com.mehla.zenflow.ui.login.Login;
 
+//import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -108,16 +114,20 @@ public class WorkoutsFragment extends Fragment {
             }
 
             @Override
-            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
                 int position = viewHolder.getBindingAdapterPosition();
 
-                // Remove data from Firebase or any other necessary operations, if needed
-                removeDataFromFirebase(workoutsList.get(position)); // Implement this function based on how you handle Firebase data
+                Map<String, Object> map = workoutsList.get(position);
+                Workout deletedWorkout = mapToWorkout(map);
+                String workoutIdToDelete = deletedWorkout.getWorkoutId();
 
-                // Remove the item from the list and notify the adapter
+                deleteWorkoutFromFirebase(workoutIdToDelete);
+
                 workoutsList.remove(position);
                 adapter.notifyItemRemoved(position);
             }
+
+
 
             private void removeDataFromFirebase(Map<String, Object> workout) {
                 // Assuming you have a unique ID for each workout to identify it in Firebase
@@ -160,6 +170,46 @@ public class WorkoutsFragment extends Fragment {
 
 
         return root;
+    }
+
+    private void deleteWorkoutFromFirebase(String workoutIdToDelete) {
+        db.collection("users").document(user.getUid()).collection("workouts")
+                .document(workoutIdToDelete)
+                .delete()
+                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d("Firestore", "Workout deleted successfully.");
+
+                        // Show Snackbar upon successful deletion
+                        Snackbar.make(binding.getRoot(), "Workout deleted successfully!", Snackbar.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d("Firestore", "Error deleting workout.", e);
+
+                        // Show Snackbar upon failure
+                        Snackbar.make(binding.getRoot(), "Failed to delete workout.", Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+
+    public Workout mapToWorkout(Map<String, Object> map) {
+        Workout workout = new Workout();
+
+        workout.setWorkoutId((String) map.get("workoutId"));
+        workout.setExerciseName((String) map.get("ExerciseName"));
+        workout.setDay((int) (long) map.get("Day"));
+        workout.setMonth((int) (long) map.get("Month"));
+        workout.setYear((int) (long) map.get("Year"));
+        workout.setMinute((int) (long) map.get("Minute"));
+        workout.setSecond((int) (long) map.get("Second"));
+        workout.setCreationDate((Timestamp) map.get("creationDate"));
+
+        return workout;
     }
 
     @Override
@@ -312,10 +362,18 @@ public class WorkoutsFragment extends Fragment {
                 .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
-                        Log.d("ExerciseDialog", "Workout added with ID: " + documentReference.getId());
-                        Snackbar.make(rootView, "Data inserted successfully!", Snackbar.LENGTH_SHORT).show();
+                        String uniqueId = documentReference.getId();
 
-                        fetchWorkouts();
+                        workoutData.put("workoutId", uniqueId);
+                        documentReference.set(workoutData, SetOptions.merge())
+                                .addOnSuccessListener(aVoid -> {
+                                    Snackbar.make(rootView, "Data inserted successfully!", Snackbar.LENGTH_SHORT).show();
+                                    fetchWorkouts();
+                                })
+                                .addOnFailureListener(e -> {
+                                    Log.d("ExerciseDialog", "Error updating workout ID: " + e.getMessage());
+                                    Snackbar.make(rootView, "Error: " + e.getMessage(), Snackbar.LENGTH_SHORT).show();
+                                });
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
@@ -392,8 +450,10 @@ public class WorkoutsFragment extends Fragment {
                         if (task.isSuccessful()) {
                             workoutsList.clear(); // Clear the existing data
 
-                            for (DocumentSnapshot doc : task.getResult()) {
-                                workoutsList.add(doc.getData());
+                            for (QueryDocumentSnapshot document : task.getResult()) {
+                                Workout workout = document.toObject(Workout.class);
+                                workout.setWorkoutId(document.getId()); // Set the workoutId
+                                workoutsList.add(workout.toMap());
                             }
 
                             if (workoutsList.isEmpty()) {
