@@ -8,6 +8,9 @@ import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -28,7 +31,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -94,6 +99,65 @@ public class WorkoutsFragment extends Fragment {
         }
 
         fetchWorkouts();
+
+        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                // Not needed since we are only implementing swipe to delete.
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {
+                int position = viewHolder.getBindingAdapterPosition();
+
+                // Remove data from Firebase or any other necessary operations, if needed
+                removeDataFromFirebase(workoutsList.get(position)); // Implement this function based on how you handle Firebase data
+
+                // Remove the item from the list and notify the adapter
+                workoutsList.remove(position);
+                adapter.notifyItemRemoved(position);
+            }
+
+            private void removeDataFromFirebase(Map<String, Object> workout) {
+                // Assuming you have a unique ID for each workout to identify it in Firebase
+
+            }
+
+
+            @Override
+            public void onChildDraw(@NonNull Canvas c, @NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, float dX, float dY, int actionState, boolean isCurrentlyActive) {
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+
+                View itemView = viewHolder.itemView;
+                Paint paint = new Paint();
+
+                if (dX > 0) { // Swipe Right
+                    paint.setColor(Color.RED);
+                    c.drawRect((float) itemView.getLeft(), (float) itemView.getTop(), dX, (float) itemView.getBottom(), paint);
+
+                    paint.setColor(Color.WHITE);
+                    paint.setTextSize(40);
+
+                    String text = "Swipe to delete";
+                    float textWidth = paint.measureText(text);
+                    float textHeight = paint.descent() - paint.ascent();
+
+                    // Calculate position to center the text
+                    float textX = (float) itemView.getLeft() + (dX / 2) - (textWidth / 2);
+                    float textY = (float) itemView.getTop() + ((float) itemView.getBottom() - (float) itemView.getTop()) / 2 + (textHeight / 2) - paint.descent();
+
+                    c.drawText(text, textX, textY, paint);
+                } else if (dX < 0) { // Swipe Left
+                    // For now, we aren't implementing left swipe. If needed, you can add a similar logic here for left swipe.
+                }
+
+                super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
+            }
+
+        });
+        itemTouchHelper.attachToRecyclerView(binding.workoutsRecyclerView);
+
 
         return root;
     }
