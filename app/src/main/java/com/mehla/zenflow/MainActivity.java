@@ -6,7 +6,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.Toast;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
@@ -21,10 +20,9 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.navigation.NavigationBarView;
-import com.google.android.material.snackbar.Snackbar;
 import com.mehla.zenflow.databinding.ActivityMainBinding;
 import com.mehla.zenflow.services.DarkMode;
-import com.mehla.zenflow.ui.dashboard.ExerciseDetails;
+import com.mehla.zenflow.services.FirebaseService;
 import com.mehla.zenflow.ui.stopwatch.Stopwatch;
 import com.mehla.zenflow.ui.timer.Timer;
 import com.mehla.zenflow.ui.workouts.WorkoutsFragment;
